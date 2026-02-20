@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCERT Quest — Grade 9–12 Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05070f;
+    --panel: #0d1120;
+    --border: #1e2a4a;
+    --accent: #00e5ff;
+    --accent2: #ff4081;
+    --gold: #ffd740;
+    --green: #00e676;
+    --text: #e0eaff;
+    --dim: #5a6a8a;
+    --math-color: #00e5ff;
+    --sci-color: #00e676;
+    --sst-color: #ff9100;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 40%, rgba(0,229,255,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(255,64,129,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; width: 100%; max-width: 800px; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HOME SCREEN ── */
+  .home-logo {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .home-logo .tagline {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 30px rgba(0,229,255,0.4));
+  }
+
+  .home-logo .sub {
+    font-size: 0.9rem;
+    color: var(--dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .subject-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 16px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .subject-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .subject-card.math::before { background: radial-gradient(circle at center, rgba(0,229,255,0.1), transparent 70%); }
+  .subject-card.science::before { background: radial-gradient(circle at center, rgba(0,230,118,0.1), transparent 70%); }
+  .subject-card.sst::before { background: radial-gradient(circle at center, rgba(255,145,0,0.1), transparent 70%); }
+
+  .subject-card:hover::before { opacity: 1; }
+  .subject-card:hover { transform: translateY(-4px); }
+  .subject-card.math:hover { border-color: var(--math-color); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
+  .subject-card.science:hover { border-color: var(--sci-color); box-shadow: 0 0 20px rgba(0,230,118,0.2); }
+  .subject-card.sst:hover { border-color: var(--sst-color); box-shadow: 0 0 20px rgba(255,145,0,0.2); }
+
+  .subject-card.selected.math { border-color: var(--math-color); background: rgba(0,229,255,0.08); }
+  .subject-card.selected.science { border-color: var(--sci-color); background: rgba(0,230,118,0.08); }
+  .subject-card.selected.sst { border-color: var(--sst-color); background: rgba(255,145,0,0.08); }
+
+  .subject-icon { font-size: 2.2rem; margin-bottom: 10px; }
+  .subject-name { font-family: 'Orbitron', monospace; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+  .subject-card.math .subject-name { color: var(--math-color); }
+  .subject-card.science .subject-name { color: var(--sci-color); }
+  .subject-card.sst .subject-name { color: var(--sst-color); }
+
+  .grade-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  .grade-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    padding: 10px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .grade-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .grade-btn.selected { border-color: var(--accent); background: rgba(0,229,255,0.1); color: var(--accent); }
+
+  .difficulty-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 36px;
+  }
+
+  .diff-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+
+  .diff-btn.easy { background: rgba(0,230,118,0.1); border-color: rgba(0,230,118,0.3); color: var(--green); }
+  .diff-btn.medium { background: rgba(255,215,64,0.1); border-color: rgba(255,215,64,0.3); color: var(--gold); }
+  .diff-btn.hard { background: rgba(255,64,129,0.1); border-color: rgba(255,64,129,0.3); color: var(--accent2); }
+  .diff-btn.selected { box-shadow: 0 0 15px currentColor; transform: scale(1.05); }
+
+  .start-btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(255,64,129,0.15));
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .start-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(255,64,129,0.2));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .start-btn:hover::before { opacity: 1; }
+  .start-btn:hover { box-shadow: 0 0 30px rgba(0,229,255,0.3); transform: translateY(-2px); }
+
+  /* ── QUIZ SCREEN ── */
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 14px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .quiz-meta { display: flex; gap: 20px; align-items: center; }
+  .badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .badge.math { background: rgba(0,229,255,0.1); color: var(--math-color); border: 1px solid rgba(0,229,255,0.3); }
+  .badge.science { background: rgba(0,230,118,0.1); color: var(--sci-color); border: 1px solid rgba(0,230,118,0.3); }
+  .badge.sst { background: rgba(255,145,0,0.1); color: var(--sst-color); border: 1px solid rgba(255,145,0,0.3); }
+
+  .score-display {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    color: var(--gold);
+  }
+  .score-display span { font-size: 1.1rem; font-weight: 700; }
+
+  .timer-wrap {
+    position: relative;
+    width: 56px;
+    height: 56px;
+  }
+
+  .timer-wrap svg {
+    transform: rotate(-90deg);
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .timer-circle-bg { fill: none; stroke: var(--border); stroke-width: 3; }
+  .timer-circle { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s linear, stroke 0.5s; }
+  .timer-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .progress-bar-outer {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .question-counter {
+    font-size: 0.75rem;
+    color: var(--dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 8px;
+    min-height: 80px;
+  }
+
+  .chapter-tag {
+    font-size: 0.7rem;
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-bottom: 28px;
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 540px) { .options-grid { grid-template-columns: 1fr; } .subject-grid { grid-template-columns: 1fr; } }
+
+  .option-btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 16px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.9rem;
+    font-family: 'Exo 2', sans-serif;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--dim);
+    min-width: 18px;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.05);
+    transform: translateX(4px);
+  }
+
+  .option-btn.correct {
+    border-color: var(--green);
+    background: rgba(0,230,118,0.12);
+    animation: correctPop 0.4s ease;
+  }
+
+  .option-btn.correct .option-label { color: var(--green); }
+
+  .option-btn.wrong {
+    border-color: var(--accent2);
+    background: rgba(255,64,129,0.12);
+    animation: shake 0.4s ease;
+  }
+
+  .option-btn.wrong .option-label { color: var(--accent2); }
+
+  @keyframes correctPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .feedback-bar {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    transition: all 0.3s;
+    opacity: 0;
+  }
+
+  .feedback-bar.show { opacity: 1; }
+  .feedback-bar.correct { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .feedback-bar.wrong { background: rgba(255,64,129,0.1); color: var(--accent2); border: 1px solid rgba(255,64,129,0.3); }
+
+  .next-btn {
+    width: 100%;
+    padding: 14px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .next-btn.ready {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,255,0.05);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(0,229,255,0.3); }
+    50% { box-shadow: 0 0 15px rgba(0,229,255,0.3); }
+  }
+
+  /* ── RESULTS SCREEN ── */
+  .results-wrap { text-align: center; }
+
+  .results-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: 3px;
+  }
+
+  .results-score-ring {
+    width: 160px;
+    height: 160px;
+    margin: 30px auto;
+    position: relative;
+  }
+
+  .results-score-ring svg { transform: rotate(-90deg); }
+
+  .results-score-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .results-score-num .big {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--gold);
+  }
+
+  .results-score-num .small { font-size: 0.75rem; color: var(--dim); letter-spacing: 2px; }
+
+  .results-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .stat-label { font-size: 0.7rem; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+
+  .rank-badge {
+    display: inline-block;
+    padding: 8px 28px;
+    border-radius: 30px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+
+  .btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-primary {
+    flex: 1;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(255,64,129,0.15));
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover { box-shadow: 0 0 20px rgba(0,229,255,0.3); }
+
+  /* Particles */
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    animation: particleFly 1s ease-out forwards;
+    z-index: 999;
+  }
+
+  @keyframes particleFly {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+
+  .combo-popup {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 30px var(--gold);
+    pointer-events: none;
+    z-index: 100;
+    animation: comboPop 0.8s ease forwards;
+  }
+
+  @keyframes comboPop {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    30% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
+    70% { opacity: 1; transform: translate(-50%, -65%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="homeScreen">
+    <div class="home-logo">
+      <div class="tagline">NCERT QUEST</div>
+      <div class="sub">Grade 9–12 · Knowledge Challenge</div>
+    </div>
+
+    <div style="margin-bottom:14px;font-size:0.75rem;color:var(--dim);text-align:center;letter-spacing:3px;text-transform:uppercase;">Select Subject</div>
+    <div class="subject-grid">
+      <div class="subject-card math selected" onclick="selectSubject('math', this)">
+        <div class="subject-icon">∑</div>
+        <div class="subject-name">Mathematics</div>
+      </div>
+      <div class="subject-card science" onclick="selectSubject('science', this)">
+        <div class="subject-icon">⚗</div>
+        <div class="subject-name">Science</div>
+      </div>
+      <div class="subject-card sst" onclick="selectSubject('sst', this)">
+        <div class="subject-icon">🗺</div>
+        <div class="subject-name">Social Studies</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;font-size:0.75rem;color:var(--dim);text-align:center;letter-spacing:3px;text-transform:uppercase;">Grade Level</div>
+    <div class="grade-row">
+      <button class="grade-btn selected" onclick="selectGrade(9, this)">Grade 9</button>
+      <button class="grade-btn" onclick="selectGrade(10, this)">Grade 10</button>
+      <button class="grade-btn" onclick="selectGrade(11, this)">Grade 11</button>
+      <button class="grade-btn" onclick="selectGrade(12, this)">Grade 12</button>
+    </div>
+
+    <div style="margin-bottom:14px;font-size:0.75rem;color:var(--dim);text-align:center;letter-spacing:3px;text-transform:uppercase;">Difficulty</div>
+    <div class="difficulty-row">
+      <button class="diff-btn easy selected" onclick="selectDiff('easy', this)">Easy</button>
+      <button class="diff-btn medium" onclick="selectDiff('medium', this)">Medium</button>
+      <button class="diff-btn hard" onclick="selectDiff('hard', this)">Hard</button>
+    </div>
+
+    <button class="start-btn" onclick="startGame()">⚡ START MISSION</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="quizScreen">
+    <div class="quiz-header">
+      <div class="quiz-meta">
+        <div class="badge" id="subjectBadge">Math</div>
+        <div id="gradeBadge" style="font-size:0.7rem;color:var(--dim);">Grade 9</div>
+      </div>
+      <div class="score-display">Score <span id="scoreVal">0</span></div>
+      <div class="timer-wrap">
+        <svg width="56" height="56" viewBox="0 0 56 56">
+          <circle class="timer-circle-bg" cx="28" cy="28" r="24"/>
+          <circle class="timer-circle" id="timerCircle" cx="28" cy="28" r="24"
+            stroke-dasharray="150.8" stroke-dashoffset="0" stroke="var(--accent)"/>
+        </svg>
+        <div class="timer-text" id="timerText">30</div>
+      </div>
+    </div>
+
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="progressBar" style="width:0%"></div>
+    </div>
+
+    <div class="question-counter" id="questionCounter">Question 1 of 10</div>
+    <div class="question-text" id="questionText">Loading...</div>
+    <div class="chapter-tag" id="chapterTag">Chapter</div>
+
+    <div class="options-grid" id="optionsGrid"></div>
+
+    <div class="feedback-bar" id="feedbackBar"></div>
+
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()" disabled>NEXT →</button>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-wrap">
+      <div class="results-title" id="resultsTitle">MISSION COMPLETE</div>
+      <div style="font-size:0.75rem;color:var(--dim);letter-spacing:3px;margin-bottom:4px;">FINAL SCORE</div>
+
+      <div class="results-score-ring">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle fill="none" stroke="var(--border)" stroke-width="8" cx="80" cy="80" r="70"/>
+          <circle fill="none" stroke="var(--gold)" stroke-width="8" cx="80" cy="80" r="70"
+            stroke-dasharray="439.8" stroke-linecap="round"
+            id="resultRing" stroke-dashoffset="439.8"/>
+        </svg>
+        <div class="results-score-num">
+          <div class="big" id="finalScore">0</div>
+          <div class="small">POINTS</div>
+        </div>
+      </div>
+
+      <div class="rank-badge" id="rankBadge"></div>
+
+      <div class="results-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="statCorrect" style="color:var(--green)">0</div>
+          <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statWrong" style="color:var(--accent2)">0</div>
+          <div class="stat-label">Wrong</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTime" style="color:var(--accent)">0s</div>
+          <div class="stat-label">Avg Time</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="showHome()">⬅ MENU</button>
+        <button class="btn-primary" onclick="retryGame()">↺ PLAY AGAIN</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── QUESTION BANK ──────────────────────────────────────────────
+const QUESTIONS = {
+  math: {
+    9: {
+      easy: [
+        { q: "What is the degree of the polynomial 3x² + 5x - 2?", opts: ["1","2","3","0"], ans: 1, ch: "Polynomials" },
+        { q: "Which of the following is an irrational number?", opts: ["√4","√9","√2","4/2"], ans: 2, ch: "Number Systems" },
+        { q: "The sum of angles of a triangle is:", opts: ["90°","180°","270°","360°"], ans: 1, ch: "Lines and Angles" },
+        { q: "Euclid's Division Lemma states a = bq + r where:", opts: ["0 ≤ r < b","0 < r < b","0 ≤ r ≤ b","r > b"], ans: 0, ch: "Number Systems" },
+        { q: "Linear equation in two variables has how many solutions?", opts: ["None","Exactly one","Exactly two","Infinitely many"], ans: 3, ch: "Linear Equations" },
+      ],
+      medium: [
+        { q: "If x + y = 12 and xy = 35, what is x² + y²?", opts: ["74","144","109","50"], ans: 0, ch: "Polynomials" },
+        { q: "A diagonal of a rectangle divides it into two congruent:", opts: ["Squares","Rhombuses","Right triangles","Equilateral triangles"], ans: 2, ch: "Quadrilaterals" },
+        { q: "The remainder when p(x) = x³ - 6x² + 2x - 4 is divided by (x-2) is:", opts: ["-8","8","-12","12"], ans: 2, ch: "Polynomials" },
+        { q: "In a parallelogram, opposite angles are:", opts: ["Supplementary","Equal","Complementary","Right angles"], ans: 1, ch: "Quadrilaterals" },
+        { q: "If √2 = 1.414, then √8 is approximately:", opts: ["2.828","1.828","3.414","4.242"], ans: 0, ch: "Number Systems" },
+      ],
+      hard: [
+        { q: "For Heron's formula with sides a, b, c, 's' stands for:", opts: ["Sum of sides","Semi-perimeter","Side ratio","Scale factor"], ans: 1, ch: "Heron's Formula" },
+        { q: "Which condition makes two triangles congruent by ASA?", opts: ["Two sides and included angle","Two angles and included side","Three sides","Two angles and any side"], ans: 1, ch: "Triangles" },
+        { q: "Volume of a sphere with radius r is:", opts: ["4πr²","(4/3)πr³","(2/3)πr³","2πr³"], ans: 1, ch: "Surface Areas & Volumes" },
+        { q: "Class mark of a class interval 20-30 is:", opts: ["10","20","25","30"], ans: 2, ch: "Statistics" },
+        { q: "P(E) + P(not E) equals:", opts: ["0","2","1","0.5"], ans: 2, ch: "Probability" },
+      ]
+    },
+    10: {
+      easy: [
+        { q: "Every positive even integer can be written as 2n where n is:", opts: ["Prime","Natural number","Negative","Irrational"], ans: 1, ch: "Real Numbers" },
+        { q: "Zeros of the polynomial x² - 5x + 6 are:", opts: ["2 and 3","1 and 6","2 and -3","−2 and −3"], ans: 0, ch: "Polynomials" },
+        { q: "The distance formula between (x₁,y₁) and (x₂,y₂) is:", opts: ["√((x₂+x₁)²+(y₂+y₁)²)","√((x₂-x₁)²+(y₂-y₁)²)","(x₂-x₁)+(y₂-y₁)","(x₂-x₁)²+(y₂-y₁)²"], ans: 1, ch: "Coordinate Geometry" },
+        { q: "Discriminant of ax²+bx+c is:", opts: ["b²-4ac","b²+4ac","4ac-b²","√(b²-4ac)"], ans: 0, ch: "Quadratic Equations" },
+        { q: "sin²θ + cos²θ equals:", opts: ["0","2","tan²θ","1"], ans: 3, ch: "Introduction to Trigonometry" },
+      ],
+      medium: [
+        { q: "If tanθ = 3/4, then sinθ equals:", opts: ["4/5","3/5","3/4","4/3"], ans: 1, ch: "Trigonometry" },
+        { q: "Two circles with equal radii are called:", opts: ["Concentric","Congruent","Similar","Tangent"], ans: 1, ch: "Circles" },
+        { q: "Area of sector with radius r and angle θ (degrees):", opts: ["πr²θ/180","πr²θ/360","2πrθ/360","πrθ/180"], ans: 1, ch: "Areas Related to Circles" },
+        { q: "The common difference in AP: 3, 7, 11, 15... is:", opts: ["3","7","4","11"], ans: 2, ch: "Arithmetic Progressions" },
+        { q: "Sum of n terms of AP with first term a and last term l:", opts: ["n(a+l)/2","n(a+l)","n(a-l)/2","2n(a+l)"], ans: 0, ch: "Arithmetic Progressions" },
+      ],
+      hard: [
+        { q: "The probability of getting a prime number when rolling a die is:", opts: ["1/2","1/3","2/3","1/6"], ans: 0, ch: "Probability" },
+        { q: "Height of a tower if shadow is 10m and angle of elevation 45°:", opts: ["10m","5m","20m","10√2 m"], ans: 0, ch: "Some Applications of Trigonometry" },
+        { q: "Volume of cone to volume of cylinder with same base and height:", opts: ["1:3","1:2","2:3","3:1"], ans: 0, ch: "Surface Areas & Volumes" },
+        { q: "Median divides a triangle into two triangles of:", opts: ["Equal angles","Equal perimeters","Equal areas","Equal bases"], ans: 2, ch: "Triangles" },
+        { q: "HCF of two numbers is 18 and LCM is 360. If one number is 36, the other is:", opts: ["90","180","72","45"], ans: 1, ch: "Real Numbers" },
+      ]
+    },
+    11: {
+      easy: [
+        { q: "A relation R on set A is reflexive if:", opts: ["(a,b)∈R implies (b,a)∈R","(a,a)∈R for all a∈A","R⊂A×B","R is empty"], ans: 1, ch: "Relations and Functions" },
+        { q: "In set notation, A∪B means:", opts: ["Elements in A only","Elements in both A and B","Elements in A or B or both","Elements only in B"], ans: 2, ch: "Sets" },
+        { q: "The value of sin(π/6) is:", opts: ["1","1/2","√3/2","0"], ans: 1, ch: "Trigonometric Functions" },
+        { q: "In a GP, ratio of successive terms is called:", opts: ["Common difference","Common ratio","Geometric mean","Partial sum"], ans: 1, ch: "Sequences and Series" },
+        { q: "lim(x→0) sinx/x equals:", opts: ["0","∞","1","x"], ans: 2, ch: "Limits and Derivatives" },
+      ],
+      medium: [
+        { q: "The number of terms in the expansion of (a+b)⁵ is:", opts: ["4","5","6","7"], ans: 2, ch: "Binomial Theorem" },
+        { q: "Slope of line 3x - 4y + 5 = 0 is:", opts: ["-4/3","3/4","4/3","-3/4"], ans: 1, ch: "Straight Lines" },
+        { q: "A complex number is written as:", opts: ["a-ib only","a+ib where a,b ∈ R","only real numbers","only imaginary numbers"], ans: 1, ch: "Complex Numbers" },
+        { q: "ⁿCᵣ equals:", opts: ["n!/(r!·(n-r)!)","n!/r!","r!/(n-r)!","n!·r!"], ans: 0, ch: "Permutations and Combinations" },
+        { q: "The eccentricity of a circle is:", opts: ["0","1","0.5","∞"], ans: 0, ch: "Conic Sections" },
+      ],
+      hard: [
+        { q: "Mean deviation for grouped data uses which central tendency?", opts: ["Mode","Median or Mean","Range","Geometric Mean"], ans: 1, ch: "Statistics" },
+        { q: "Derivative of xⁿ with respect to x is:", opts: ["xⁿ⁻¹","nxⁿ","nxⁿ⁻¹","nxⁿ⁺¹"], ans: 2, ch: "Limits and Derivatives" },
+        { q: "In how many ways can 4 students sit in a row?", opts: ["16","24","12","8"], ans: 1, ch: "Permutations and Combinations" },
+        { q: "Sum to infinity of GP (|r|<1): a/(1-r) requires:", opts: ["|r|>1","|r|=1","|r|<1","|r|≤1"], ans: 2, ch: "Sequences and Series" },
+        { q: "The conjugate of a complex number z = a+ib is:", opts: ["a-ib","a+ib","-a+ib","-a-ib"], ans: 0, ch: "Complex Numbers" },
+      ]
+    },
+    12: {
+      easy: [
+        { q: "∫eˣ dx equals:", opts: ["eˣ + C","xeˣ + C","eˣ/x + C","e⁻ˣ + C"], ans: 0, ch: "Integrals" },
+        { q: "d/dx(sin x) is:", opts: ["-cos x","cos x","sec x","-sin x"], ans: 1, ch: "Continuity and Differentiability" },
+        { q: "Order of the differential equation dy/dx = 5y is:", opts: ["0","1","2","3"], ans: 1, ch: "Differential Equations" },
+        { q: "P(A∩B) = P(A)·P(B) implies events A and B are:", opts: ["Mutually exclusive","Independent","Exhaustive","Complementary"], ans: 1, ch: "Probability" },
+        { q: "d/dx(log x) equals:", opts: ["1/x","log x/x","x","1/(x log x)"], ans: 0, ch: "Continuity and Differentiability" },
+      ],
+      medium: [
+        { q: "∫sinx dx equals:", opts: ["cos x + C","-cos x + C","sin x + C","-sin x + C"], ans: 1, ch: "Integrals" },
+        { q: "A square matrix A with |A|=0 is called:", opts: ["Identity","Diagonal","Singular","Non-singular"], ans: 2, ch: "Determinants" },
+        { q: "The direction cosines of a line satisfy:", opts: ["l+m+n=1","l+m+n=0","l²+m²+n²=1","l²+m²+n²=0"], ans: 2, ch: "Three Dimensional Geometry" },
+        { q: "Bayes' theorem is used to find:", opts: ["Joint probability","Posterior probability","Marginal probability","Sample space"], ans: 1, ch: "Probability" },
+        { q: "Second derivative test: if f''(c)>0, then c is a:", opts: ["Point of inflection","Local maximum","Local minimum","Saddle point"], ans: 2, ch: "Applications of Derivatives" },
+      ],
+      hard: [
+        { q: "The area between curves y=f(x) and x-axis from a to b is:", opts: ["∫f(x)dx","∫|f(x)|dx","f(b)-f(a)","(f(a)+f(b))/2"], ans: 1, ch: "Application of Integrals" },
+        { q: "If Adj(A) = A and |A|=2, matrix is of order:", opts: ["2×2","3×3","Any order","Depends on A"], ans: 0, ch: "Matrices" },
+        { q: "Corner points method is used in:", opts: ["Integration","Linear Programming","Differentiation","Probability"], ans: 1, ch: "Linear Programming" },
+        { q: "The general solution of dy/dx = y is:", opts: ["y = Ceˣ","y = e⁻ˣ","y = C + eˣ","y = x + C"], ans: 0, ch: "Differential Equations" },
+        { q: "Angle between two planes is the angle between their:", opts: ["Position vectors","Normal vectors","Direction ratios","Tangent vectors"], ans: 1, ch: "Three Dimensional Geometry" },
+      ]
+    }
+  },
+  science: {
+    9: {
+      easy: [
+        { q: "What is the SI unit of force?", opts: ["Joule","Watt","Newton","Pascal"], ans: 2, ch: "Force and Laws of Motion" },
+        { q: "Which organelle is called the powerhouse of the cell?", opts: ["Nucleus","Mitochondria","Ribosome","Vacuole"], ans: 1, ch: "The Fundamental Unit of Life" },
+        { q: "Chemical formula of water is:", opts: ["H₂O₂","H₂O","HO","H₃O"], ans: 1, ch: "Matter in Our Surroundings" },
+        { q: "Work = Force ×", opts: ["Mass","Velocity","Displacement","Time"], ans: 2, ch: "Work and Energy" },
+        { q: "Atoms of the same element with different mass numbers are:", opts: ["Isobars","Isotopes","Isotones","Allotropes"], ans: 1, ch: "Structure of the Atom" },
+      ],
+      medium: [
+        { q: "An object moves with uniform speed in a circular path. Its acceleration is:", opts: ["Zero","Centripetal","Tangential","Uniform"], ans: 1, ch: "Motion" },
+        { q: "pH of a neutral solution is:", opts: ["0","7","14","1"], ans: 1, ch: "Acids, Bases and Salts" },
+        { q: "Which type of tissue forms the outer covering of leaves?", opts: ["Vascular","Epidermal","Meristematic","Ground"], ans: 1, ch: "Tissues" },
+        { q: "Archimedes' principle is related to:", opts: ["Pressure","Buoyancy","Friction","Gravity"], ans: 1, ch: "Gravitation" },
+        { q: "The number of moles in 18g of water (mol.wt=18) is:", opts: ["2","18","1","0.5"], ans: 2, ch: "Atoms and Molecules" },
+      ],
+      hard: [
+        { q: "Law of conservation of momentum states that total momentum:", opts: ["Always increases","Is always zero","Remains constant in absence of external force","Depends on mass"], ans: 2, ch: "Force and Laws of Motion" },
+        { q: "Which disease is caused by deficiency of Vitamin C?", opts: ["Rickets","Scurvy","Beri-beri","Night blindness"], ans: 1, ch: "Why Do We Fall Ill" },
+        { q: "In which layer of atmosphere does weather occur?", opts: ["Stratosphere","Mesosphere","Troposphere","Thermosphere"], ans: 2, ch: "Natural Resources" },
+        { q: "Valency of nitrogen in N₂O₅ is:", opts: ["3","2","5","1"], ans: 2, ch: "Atoms and Molecules" },
+        { q: "The formula for kinetic energy is:", opts: ["mgh","mv","½mv²","Fd"], ans: 2, ch: "Work and Energy" },
+      ]
+    },
+    10: {
+      easy: [
+        { q: "Which type of lens is used to correct myopia?", opts: ["Convex","Concave","Bifocal","Plano-convex"], ans: 1, ch: "The Human Eye and Colourful World" },
+        { q: "HCl is an example of:", opts: ["Strong acid","Weak acid","Strong base","Weak base"], ans: 0, ch: "Acids, Bases and Salts" },
+        { q: "Which gas is produced when zinc reacts with dilute HCl?", opts: ["CO₂","H₂","O₂","Cl₂"], ans: 1, ch: "Chemical Reactions and Equations" },
+        { q: "Ohm's law states V =", opts: ["IR","I/R","I²R","√(IR)"], ans: 0, ch: "Electricity" },
+        { q: "The process by which plants make food is called:", opts: ["Respiration","Transpiration","Photosynthesis","Digestion"], ans: 2, ch: "Life Processes" },
+      ],
+      medium: [
+        { q: "In human body, male gametes are produced in:", opts: ["Ovary","Uterus","Testes","Vas deferens"], ans: 2, ch: "How do Organisms Reproduce?" },
+        { q: "Flemings left-hand rule is used to find direction of:", opts: ["Current","Magnetic field","Force on conductor","Induced EMF"], ans: 2, ch: "Magnetic Effects of Electric Current" },
+        { q: "The focal length of a concave mirror is -10cm. Its radius of curvature is:", opts: ["5cm","10cm","20cm","-20cm"], ans: 3, ch: "Light — Reflection and Refraction" },
+        { q: "Mendel's law of segregation is also called law of:", opts: ["Independent assortment","Dominance","Purity of gametes","Heredity"], ans: 2, ch: "Heredity and Evolution" },
+        { q: "Which of these is a non-renewable source of energy?", opts: ["Solar","Wind","Coal","Biomass"], ans: 2, ch: "Sources of Energy" },
+      ],
+      hard: [
+        { q: "The ratio of reflected light to incident light is:", opts: ["Refraction","Albedo","Reflectance","Luminance"], ans: 2, ch: "Light" },
+        { q: "A 100W bulb is used for 10 hours. Energy consumed is:", opts: ["100 Wh","1000 Wh","10 Wh","100 kWh"], ans: 1, ch: "Electricity" },
+        { q: "Trophic efficiency in energy transfer between levels is approximately:", opts: ["100%","50%","10%","1%"], ans: 2, ch: "Our Environment" },
+        { q: "Which component is NOT part of human digestive system?", opts: ["Liver","Pancreas","Kidney","Small intestine"], ans: 2, ch: "Life Processes" },
+        { q: "pH of blood in human body is approximately:", opts: ["6","7","7.4","8"], ans: 2, ch: "Acids, Bases and Salts" },
+      ]
+    },
+    11: {
+      easy: [
+        { q: "Atomic number of Carbon is:", opts: ["6","8","12","14"], ans: 0, ch: "Some Basic Concepts of Chemistry" },
+        { q: "Which state of matter has definite volume but no definite shape?", opts: ["Solid","Liquid","Gas","Plasma"], ans: 1, ch: "States of Matter" },
+        { q: "First law of thermodynamics is based on conservation of:", opts: ["Mass","Energy","Momentum","Charge"], ans: 1, ch: "Thermodynamics" },
+        { q: "Cell wall of plant cells is made of:", opts: ["Chitin","Cellulose","Protein","Lipid"], ans: 1, ch: "Cell: The Unit of Life" },
+        { q: "Speed of light in vacuum is approximately:", opts: ["3×10⁶ m/s","3×10⁸ m/s","3×10¹⁰ m/s","3×10⁴ m/s"], ans: 1, ch: "Waves" },
+      ],
+      medium: [
+        { q: "Which type of bond involves sharing of electrons?", opts: ["Ionic","Covalent","Metallic","Hydrogen"], ans: 1, ch: "Chemical Bonding and Molecular Structure" },
+        { q: "Boyle's law states that at constant temperature, pressure is:", opts: ["Proportional to volume","Inversely proportional to volume","Equal to volume","Constant"], ans: 1, ch: "States of Matter" },
+        { q: "Which organelle is responsible for protein synthesis?", opts: ["Mitochondria","Ribosome","Nucleus","Golgi apparatus"], ans: 1, ch: "Biomolecules" },
+        { q: "Newton's second law F = ma gives force when:", opts: ["a=0","mass is constant","velocity is constant","energy is constant"], ans: 1, ch: "Laws of Motion" },
+        { q: "Enthalpy change for a reaction at constant pressure equals:", opts: ["Work done","Heat absorbed or released","Internal energy","Free energy"], ans: 1, ch: "Thermodynamics" },
+      ],
+      hard: [
+        { q: "Heisenberg's uncertainty principle states that we cannot simultaneously determine exact:", opts: ["Mass and charge","Position and momentum","Energy and mass","Velocity and acceleration"], ans: 1, ch: "Structure of Atom" },
+        { q: "Photoelectric effect demonstrates:", opts: ["Wave nature of light","Particle nature of light","Dual nature of electrons","Wave-particle duality of matter"], ans: 1, ch: "Dual Nature of Radiation" },
+        { q: "Which chromosome combination determines maleness in humans?", opts: ["XX","XY","YY","XO"], ans: 1, ch: "Molecular Basis of Inheritance" },
+        { q: "The oxidation state of Cr in K₂Cr₂O₇ is:", opts: ["+2","+4","+6","+7"], ans: 2, ch: "Redox Reactions" },
+        { q: "Moment of inertia depends on mass and:", opts: ["Speed","Distribution of mass about axis","Volume","Density"], ans: 1, ch: "Systems of Particles and Rotational Motion" },
+      ]
+    },
+    12: {
+      easy: [
+        { q: "DNA replication is:", opts: ["Conservative","Semi-conservative","Dispersive","Random"], ans: 1, ch: "Molecular Basis of Inheritance" },
+        { q: "Ohm's law breaks down in which device?", opts: ["Resistor","Diode","Capacitor","Inductor"], ans: 1, ch: "Current Electricity" },
+        { q: "Which blood group is universal donor?", opts: ["A","B","AB","O"], ans: 3, ch: "Human Health and Disease" },
+        { q: "Faraday's law of electromagnetic induction deals with:", opts: ["Magnetic force","Induced EMF","Electric potential","Static charge"], ans: 1, ch: "Electromagnetic Induction" },
+        { q: "Ozone layer is mainly found in:", opts: ["Troposphere","Stratosphere","Mesosphere","Ionosphere"], ans: 1, ch: "Environmental Chemistry" },
+      ],
+      medium: [
+        { q: "Band gap of semiconductor is approximately:", opts: ["0 eV","0.5-3 eV","More than 5 eV","Exactly 1 eV"], ans: 1, ch: "Semiconductor Electronics" },
+        { q: "Malthus theory states population grows in which progression?", opts: ["Arithmetic","Geometric","Harmonic","Random"], ans: 1, ch: "Evolution" },
+        { q: "SN2 reaction involves:", opts: ["Two steps","One step with two reactants","Free radical mechanism","Carbocation intermediate"], ans: 1, ch: "Haloalkanes and Haloarenes" },
+        { q: "Equivalent conductance of an electrolyte at infinite dilution follows:", opts: ["Kohlrausch's law","Faraday's law","Ohm's law","Henry's law"], ans: 0, ch: "Electrochemistry" },
+        { q: "Work function in photoelectric effect is the minimum energy to:", opts: ["Excite an electron","Eject an electron from surface","Ionize an atom","Break a bond"], ans: 1, ch: "Dual Nature of Radiation" },
+      ],
+      hard: [
+        { q: "Which gate combination can produce all other logic gates?", opts: ["AND gate","OR gate","NAND gate","XOR gate"], ans: 2, ch: "Semiconductor Electronics" },
+        { q: "Hardy-Weinberg principle requires which of the following?", opts: ["Natural selection","Large random mating population","Mutation","Small isolated population"], ans: 1, ch: "Evolution" },
+        { q: "In an LCR circuit, resonance occurs when:", opts: ["XL=XC","XL>XC","XC>XL","R=0"], ans: 0, ch: "Alternating Current" },
+        { q: "Gibbs free energy ΔG<0 indicates a reaction is:", opts: ["Endothermic","Spontaneous","Non-spontaneous","At equilibrium"], ans: 1, ch: "Thermodynamics" },
+        { q: "Which compound shows optical isomerism?", opts: ["CH₄","CH₃CHO","CHCl₃","CH₃CH(OH)COOH"], ans: 3, ch: "Stereochemistry" },
+      ]
+    }
+  },
+  sst: {
+    9: {
+      easy: [
+        { q: "The French Revolution began in which year?", opts: ["1776","1789","1800","1815"], ans: 1, ch: "The French Revolution" },
+        { q: "Which Indian state has the largest area?", opts: ["Maharashtra","Rajasthan","Madhya Pradesh","Uttar Pradesh"], ans: 1, ch: "India — Size and Location" },
+        { q: "Lok Sabha is also known as:", opts: ["Upper House","House of Elders","House of the People","State Assembly"], ans: 2, ch: "Democratic Politics" },
+        { q: "The Nile River flows through which continent?", opts: ["Asia","Europe","Africa","South America"], ans: 2, ch: "Physical Features of India" },
+        { q: "GDP stands for:", opts: ["Gross Domestic Product","General Development Plan","Government Deposit Policy","Global Distribution Plan"], ans: 0, ch: "The Story of Village Palampur" },
+      ],
+      medium: [
+        { q: "The policy of 'Apartheid' was practiced in:", opts: ["India","USA","South Africa","Australia"], ans: 2, ch: "Democracy in the Contemporary World" },
+        { q: "Which latitude passes through the middle of India?", opts: ["Tropic of Cancer","Tropic of Capricorn","Equator","Arctic Circle"], ans: 0, ch: "India — Size and Location" },
+        { q: "The 'Boll Weevil' pest attacked which crop in USA?", opts: ["Wheat","Rice","Cotton","Corn"], ans: 2, ch: "Forest Society and Colonialism" },
+        { q: "Who wrote 'The Communist Manifesto'?", opts: ["Lenin","Stalin","Marx and Engels","Rousseau"], ans: 2, ch: "Socialism in Europe and the Russian Revolution" },
+        { q: "What type of farming is done in Western Europe intensively?", opts: ["Subsistence","Plantation","Commercial","Slash and Burn"], ans: 2, ch: "Peasants and Farmers" },
+      ],
+      hard: [
+        { q: "The 'Rowlatt Act' of 1919 gave British authorities power to:", opts: ["Tax Indians","Arrest without trial","Ban Congress","Impose curfew"], ans: 1, ch: "Nazism and the Rise of Hitler" },
+        { q: "Koyal, Koel and Sankh rivers drain into:", opts: ["Bay of Bengal","Arabian Sea","Pacific Ocean","Indian Ocean"], ans: 0, ch: "Drainage" },
+        { q: "MNREGA guarantees how many days of employment per year?", opts: ["50","75","100","150"], ans: 2, ch: "Food Security in India" },
+        { q: "Which Constitutional Amendment lowered voting age from 21 to 18?", opts: ["42nd","44th","61st","73rd"], ans: 2, ch: "Electoral Politics" },
+        { q: "The concept of 'total institution' was introduced by:", opts: ["Weber","Foucault","Goffman","Durkheim"], ans: 2, ch: "Socialism in Europe" },
+      ]
+    },
+    10: {
+      easy: [
+        { q: "Who was the first Governor General of independent India?", opts: ["Dr. Rajendra Prasad","Lord Mountbatten","C. Rajagopalachari","Sardar Patel"], ans: 1, ch: "Nationalism in India" },
+        { q: "The Berlin Wall fell in:", opts: ["1985","1987","1989","1991"], ans: 2, ch: "The Rise of Nationalism in Europe" },
+        { q: "Which sector employs the most people in India?", opts: ["Primary","Secondary","Tertiary","Quaternary"], ans: 0, ch: "Sectors of the Indian Economy" },
+        { q: "RTI Act stands for:", opts: ["Right to Income","Right to Information","Right to Independence","Rights to Identity"], ans: 1, ch: "Democratic Politics" },
+        { q: "Power sharing between central and state governments is called:", opts: ["Separation of powers","Federalism","Democracy","Secularism"], ans: 1, ch: "Federalism" },
+      ],
+      medium: [
+        { q: "The Chipko Movement was associated with protecting:", opts: ["Rivers","Forests","Wildlife","Soil"], ans: 1, ch: "Resources and Development" },
+        { q: "Non-Cooperation Movement was launched in:", opts: ["1919","1920","1921","1922"], ans: 1, ch: "Nationalism in India" },
+        { q: "Which organization monitors working of MNCs?", opts: ["WTO","IMF","ILO","UNESCO"], ans: 0, ch: "Globalisation and the Indian Economy" },
+        { q: "Pressure groups differ from political parties in that they:", opts: ["Contest elections","Form government","Influence decisions without contesting","Have no members"], ans: 2, ch: "Political Parties" },
+        { q: "In the Bismarck model of development, the key driver was:", opts: ["Agriculture","Heavy industry","Trade","Education"], ans: 1, ch: "The Rise of Nationalism in Europe" },
+      ],
+      hard: [
+        { q: "SEBI is responsible for regulating:", opts: ["Banks","Stock markets","Insurance","Foreign trade"], ans: 1, ch: "Money and Credit" },
+        { q: "The Dalit Panthers was modelled after the:", opts: ["Indian National Congress","Black Panthers","Communist Party","RSS"], ans: 1, ch: "Social Movements" },
+        { q: "Laterite soil is found mainly in:", opts: ["Punjab","Rajasthan","Karnataka plateau","Indo-Gangetic plain"], ans: 2, ch: "Resources and Development" },
+        { q: "The concept of 'Creamy Layer' in OBC reservation relates to:", opts: ["Education level","Income limit","Age","Regional origin"], ans: 1, ch: "Social and Political Life" },
+        { q: "Horizontal power sharing exists among:", opts: ["Different levels of government","Organs of government","Communities","Political parties"], ans: 1, ch: "Power Sharing" },
+      ]
+    },
+    11: {
+      easy: [
+        { q: "The Indian Constitution was adopted on:", opts: ["15 Aug 1947","26 Jan 1950","26 Nov 1949","2 Oct 1947"], ans: 2, ch: "Constitution as a Living Document" },
+        { q: "Who was the Chairman of the Constituent Assembly?", opts: ["Gandhi","Nehru","Ambedkar","Prasad"], ans: 3, ch: "Constitution: Why and How?" },
+        { q: "The term 'Secular' was added to Preamble by which Amendment?", opts: ["42nd","44th","52nd","73rd"], ans: 0, ch: "Rights in the Indian Constitution" },
+        { q: "Monsoon season in India lasts approximately:", opts: ["2 months","4 months","6 months","8 months"], ans: 1, ch: "Atmosphere" },
+        { q: "Frictional unemployment is caused by:", opts: ["Lack of skills","People between jobs","Economic recession","Seasonal demand"], ans: 1, ch: "Indian Economy on the Eve of Independence" },
+      ],
+      medium: [
+        { q: "The first Five Year Plan of India focused mainly on:", opts: ["Industrialisation","Agriculture","Education","Military"], ans: 1, ch: "Indian Economy 1950-1990" },
+        { q: "Theory of plate tectonics explains:", opts: ["Ocean currents","Earthquakes and volcanic activity","Rainfall patterns","River formation"], ans: 1, ch: "Interior of the Earth" },
+        { q: "Which Article of Indian Constitution deals with election of President?", opts: ["Article 52","Article 54","Article 58","Article 61"], ans: 1, ch: "Executive" },
+        { q: "'Structural adjustment' programs were promoted by:", opts: ["NAM","G7","IMF and World Bank","ASEAN"], ans: 2, ch: "Liberalisation, Privatisation and Globalisation" },
+        { q: "Which geomorphic process involves movement under gravity?", opts: ["Weathering","Mass wasting","Erosion","Deposition"], ans: 1, ch: "Geomorphic Processes" },
+      ],
+      hard: [
+        { q: "Judicial review in India is borrowed from:", opts: ["UK","USA","USSR","Canada"], ans: 1, ch: "Judiciary" },
+        { q: "Lorenz Curve is used to measure:", opts: ["GDP","Inflation","Income inequality","Poverty"], ans: 2, ch: "Poverty" },
+        { q: "The term 'demographic dividend' refers to:", opts: ["High birth rate","Large working age population","Low death rate","High life expectancy"], ans: 1, ch: "Human Capital Formation in India" },
+        { q: "Which article permits preventive detention in India?", opts: ["Article 19","Article 21","Article 22","Article 32"], ans: 2, ch: "Rights in the Indian Constitution" },
+        { q: "The Mahalanobis model emphasized development through:", opts: ["Agriculture","Heavy industry","Services","Trade"], ans: 1, ch: "Indian Economy 1950-1990" },
+      ]
+    },
+    12: {
+      easy: [
+        { q: "Who founded the Non-Aligned Movement?", opts: ["Gandhi","Nehru, Nkrumah, Nasser","Churchill","Stalin"], ans: 1, ch: "The Cold War Era" },
+        { q: "SAARC stands for:", opts: ["South Asian Association for Regional Cooperation","Southeast Asian Alliance","South American Regional Conference","Asian Regional Committee"], ans: 0, ch: "South Asia" },
+        { q: "The United Nations has how many Security Council permanent members?", opts: ["3","5","7","10"], ans: 1, ch: "United Nations and Its Agencies" },
+        { q: "Green Revolution in India primarily benefited which crop?", opts: ["Rice and wheat","Cotton","Jute","Sugarcane"], ans: 0, ch: "Development Experience" },
+        { q: "Which political party governed India from 1947-1977?", opts: ["BJP","CPI","Congress","Janata Party"], ans: 2, ch: "Party System" },
+      ],
+      medium: [
+        { q: "The 'Panchsheel Agreement' was signed between:", opts: ["India and Pakistan","India and China","India and USA","India and USSR"], ans: 1, ch: "India's Foreign Policy" },
+        { q: "Which Commission recommended OBC reservations at national level?", opts: ["Kothari","Mandal","Sarkaria","Nanavati"], ans: 1, ch: "Social and New Social Movements" },
+        { q: "The hegemony of USA post Cold War is often called:", opts: ["Bipolarity","Multi-polarity","Unipolarity","Tripolarity"], ans: 2, ch: "US Hegemony in World Politics" },
+        { q: "The right to vote is a:", opts: ["Fundamental right","Constitutional right","Legal right","Natural right"], ans: 1, ch: "Democratic Politics" },
+        { q: "Which PM introduced economic liberalisation in 1991?", opts: ["Rajiv Gandhi","VP Singh","PV Narasimha Rao","Deve Gowda"], ans: 2, ch: "Development Experience" },
+      ],
+      hard: [
+        { q: "The Kyoto Protocol deals with:", opts: ["Nuclear disarmament","Climate change","Biodiversity","Trade tariffs"], ans: 1, ch: "Environment and Natural Resources" },
+        { q: "The 'Responsibility to Protect' doctrine was adopted by UN in:", opts: ["1995","2000","2005","2010"], ans: 2, ch: "Security in Contemporary World" },
+        { q: "Which doctrine justified US intervention in Korea?", opts: ["Monroe Doctrine","Truman Doctrine","Carter Doctrine","Bush Doctrine"], ans: 1, ch: "The Cold War Era" },
+        { q: "Reservation of 1/3rd seats for women is mandated in:", opts: ["Parliament","State Assemblies","Local bodies","Cabinet"], ans: 2, ch: "Women's Movements" },
+        { q: "India's 'Look East Policy' was initiated by PM:", opts: ["Nehru","Rajiv Gandhi","Narasimha Rao","Vajpayee"], ans: 2, ch: "India's Foreign Policy" },
+      ]
+    }
+  }
+};
+
+// ── GAME STATE ─────────────────────────────────────────────────
+let state = {
+  subject: 'math',
+  grade: 9,
+  difficulty: 'easy',
+  questions: [],
+  current: 0,
+  score: 0,
+  correct: 0,
+  wrong: 0,
+  answered: false,
+  timer: null,
+  timeLeft: 30,
+  totalTime: 0,
+  combo: 0,
+  startTime: null,
+};
+
+const TIME_LIMITS = { easy: 30, medium: 25, hard: 20 };
+
+// ── SELECTION ──────────────────────────────────────────────────
+function selectSubject(s, el) {
+  state.subject = s;
+  document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectGrade(g, el) {
+  state.grade = g;
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectDiff(d, el) {
+  state.difficulty = d;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── GAME FLOW ──────────────────────────────────────────────────
+function startGame() {
+  const pool = QUESTIONS[state.subject][state.grade][state.difficulty];
+  // Shuffle and pick 10 (or all if less)
+  state.questions = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(10, pool.length));
+  state.current = 0;
+  state.score = 0;
+  state.correct = 0;
+  state.wrong = 0;
+  state.combo = 0;
+  state.totalTime = 0;
+
+  // Update badge
+  const badge = document.getElementById('subjectBadge');
+  badge.textContent = state.subject === 'sst' ? 'Social Studies' : state.subject.charAt(0).toUpperCase() + state.subject.slice(1);
+  badge.className = 'badge ' + state.subject;
+  document.getElementById('gradeBadge').textContent = 'Grade ' + state.grade;
+
+  showScreen('quizScreen');
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const q = state.questions[state.current];
+  const total = state.questions.length;
+
+  document.getElementById('questionCounter').textContent = `Question ${state.current + 1} of ${total}`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('chapterTag').textContent = '📖 ' + q.ch;
+  document.getElementById('scoreVal').textContent = state.score;
+  document.getElementById('progressBar').style.width = (state.current / total * 100) + '%';
+
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+  const labels = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    grid.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedbackBar');
+  fb.className = 'feedback-bar';
+  fb.textContent = '';
+
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn';
+  nb.disabled = true;
+  nb.textContent = 'SELECT AN ANSWER →';
+
+  state.answered = false;
+  state.startTime = Date.now();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timer);
+  state.timeLeft = TIME_LIMITS[state.difficulty];
+  updateTimerUI();
+
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI();
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timer);
+      timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const max = TIME_LIMITS[state.difficulty];
+  const pct = state.timeLeft / max;
+  const circumference = 150.8;
+  const offset = circumference * (1 - pct);
+
+  const circle = document.getElementById('timerCircle');
+  circle.style.strokeDashoffset = offset;
+
+  let color = 'var(--accent)';
+  if (pct < 0.5) color = 'var(--gold)';
+  if (pct < 0.25) color = 'var(--accent2)';
+  circle.style.stroke = color;
+
+  document.getElementById('timerText').textContent = state.timeLeft;
+  document.getElementById('timerText').style.color = color;
+}
+
+function selectAnswer(idx, btn) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timer);
+
+  const elapsed = (Date.now() - state.startTime) / 1000;
+  state.totalTime += elapsed;
+
+  const q = state.questions[state.current];
+  const allBtns = document.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedbackBar');
+
+  if (idx === q.ans) {
+    btn.classList.add('correct');
+    allBtns[q.ans].classList.add('correct');
+    state.correct++;
+    state.combo++;
+
+    // Score calculation: base + time bonus + combo
+    const timeBonus = Math.floor(state.timeLeft * 2);
+    const comboBonus = state.combo >= 3 ? 50 * (state.combo - 2) : 0;
+    const gained = 100 + timeBonus + comboBonus;
+    state.score += gained;
+
+    fb.className = 'feedback-bar correct show';
+    if (state.combo >= 3) {
+      fb.textContent = `🔥 COMBO x${state.combo}! +${gained} pts`;
+      showCombo(state.combo);
+    } else {
+      fb.textContent = `✓ Correct! +${gained} pts`;
+    }
+    spawnParticles(true);
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.ans].classList.add('correct');
+    state.wrong++;
+    state.combo = 0;
+    fb.className = 'feedback-bar wrong show';
+    fb.textContent = `✗ Wrong! Correct: ${String.fromCharCode(65 + q.ans)}`;
+    spawnParticles(false);
+  }
+
+  document.getElementById('scoreVal').textContent = state.score;
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn ready';
+  nb.disabled = false;
+  nb.textContent = state.current + 1 < state.questions.length ? 'NEXT QUESTION →' : 'SEE RESULTS →';
+}
+
+function timeOut() {
+  if (state.answered) return;
+  state.answered = true;
+  state.wrong++;
+  state.combo = 0;
+
+  const q = state.questions[state.current];
+  const allBtns = document.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+  allBtns[q.ans].classList.add('correct');
+
+  const fb = document.getElementById('feedbackBar');
+  fb.className = 'feedback-bar wrong show';
+  fb.textContent = `⏱ Time's up! Correct: ${String.fromCharCode(65 + q.ans)}`;
+
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn ready';
+  nb.disabled = false;
+  nb.textContent = state.current + 1 < state.questions.length ? 'NEXT QUESTION →' : 'SEE RESULTS →';
+}
+
+function nextQuestion() {
+  state.current++;
+  if (state.current >= state.questions.length) {
+    showResults();
+  } else {
+    loadQuestion();
+  }
+}
+
+// ── RESULTS ───────────────────────────────────────────────────
+function showResults() {
+  clearInterval(state.timer);
+
+  const pct = state.correct / state.questions.length;
+  const avgTime = state.questions.length > 0 ? (state.totalTime / state.questions.length).toFixed(1) : 0;
+
+  document.getElementById('finalScore').textContent = state.score;
+  document.getElementById('statCorrect').textContent = state.correct;
+  document.getElementById('statWrong').textContent = state.wrong;
+  document.getElementById('statTime').textContent = avgTime + 's';
+
+  let rank, rankColor;
+  if (pct === 1) { rank = '🏆 PERFECT SCORE'; rankColor = 'background:rgba(255,215,64,0.15);color:var(--gold);border:1px solid rgba(255,215,64,0.5)'; }
+  else if (pct >= 0.8) { rank = '🌟 EXCELLENT'; rankColor = 'background:rgba(0,229,255,0.15);color:var(--accent);border:1px solid rgba(0,229,255,0.5)'; }
+  else if (pct >= 0.6) { rank = '👍 GOOD JOB'; rankColor = 'background:rgba(0,230,118,0.15);color:var(--green);border:1px solid rgba(0,230,118,0.5)'; }
+  else if (pct >= 0.4) { rank = '📚 KEEP STUDYING'; rankColor = 'background:rgba(255,215,64,0.1);color:var(--gold);border:1px solid rgba(255,215,64,0.3)'; }
+  else { rank = '💪 TRY AGAIN'; rankColor = 'background:rgba(255,64,129,0.1);color:var(--accent2);border:1px solid rgba(255,64,129,0.3)'; }
+
+  const rb = document.getElementById('rankBadge');
+  rb.textContent = rank;
+  rb.style.cssText = rankColor;
+
+  const title = pct >= 0.8 ? 'MISSION ACCOMPLISHED!' : pct >= 0.5 ? 'MISSION COMPLETE' : 'MISSION DEBRIEFING';
+  document.getElementById('resultsTitle').textContent = title;
+
+  showScreen('resultsScreen');
+
+  // Animate ring
+  setTimeout(() => {
+    const ring = document.getElementById('resultRing');
+    const offset = 439.8 * (1 - pct);
+    ring.style.transition = 'stroke-dashoffset 1.5s ease';
+    ring.style.strokeDashoffset = offset;
+  }, 200);
+}
+
+function showHome() {
+  clearInterval(state.timer);
+  showScreen('homeScreen');
+}
+
+function retryGame() {
+  startGame();
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function spawnParticles(success) {
+  const count = success ? 12 : 5;
+  const colors = success ? ['#00e5ff','#00e676','#ffd740','#ffffff'] : ['#ff4081','#ff6b6b'];
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 4 + Math.random() * 8;
+    const tx = (Math.random() - 0.5) * 200;
+    const ty = -100 - Math.random() * 150;
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      left:${40+Math.random()*60}%;
+      top:50%;
+      --tx:${tx}px;--ty:${ty}px;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+
+function showCombo(n) {
+  const el = document.createElement('div');
+  el.className = 'combo-popup';
+  el.textContent = `🔥 COMBO x${n}!`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+</script>
+</body>
+</html>
